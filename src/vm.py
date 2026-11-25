@@ -32,6 +32,7 @@ class VirtualMachine:
             COMMANDS["LOAD_CONST"].opcode: self.load_constant,
             COMMANDS["READ_MEM"].opcode: self.read_memory,
             COMMANDS["WRITE_MEM"].opcode: self.write_memory,
+            COMMANDS["GE"].opcode: self.greater_equal,
         }
 
     def load_constant(self, instruction):
@@ -47,6 +48,13 @@ class VirtualMachine:
         """Записывает регистр B по адресу R[D] + C."""
         address = self.registers[instruction["D"]] + instruction["C"]
         self.memory[address] = self.registers[instruction["B"]]
+
+    def greater_equal(self, instruction):
+        """Сравнивает M[R[D] + C] с R[B] и заменяет ячейку на 0 или 1."""
+        address = self.registers[instruction["D"]] + instruction["C"]
+        left = self.memory.get(address, ZERO)
+        right = self.registers[instruction["B"]]
+        self.memory[address] = int(left >= right)
 
     def run(self):
         """Читает, декодирует и выполняет команды до конца файла."""
